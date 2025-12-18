@@ -1,0 +1,56 @@
+---
+title: "Présentation Générale"
+author: "Chapitre 0"
+date: "Économétrie Financière"
+output:
+  beamer_presentation:
+    number_sections: true
+    toc: true
+header-includes:
+  - \usepackage{amsmath}
+  - \usepackage{amsfonts}
+  - \usepackage{amssymb}
+  - \setbeamertemplate{footline}{\hfill\raisebox{2pt}[0pt][0pt]\scriptsize{Économétrie Financière - Chapitre 0}\hspace*{10pt} {\insertframenumber{} /                     \inserttotalframenumber}\hspace*{2pt}
+    }
+fontsize: 8pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,
+  fig.width = 10,
+  fig.height = 5,
+  dpi = 600,
+  fig.keep = "last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+---
+
+# Vue générale du cours
+
+De la théorie des probabilités et de l'analyse de régression à l'économétrie des séries temporelles
+
+Les données de séries temporelles posent un certain nombre de problèmes par rapport à l'analyse transversale :
+
+- Corrélations entre variables à un moment donné,
+
+- Mais aussi corrélations dans le temps.
+
+- De plus, les données peuvent ne pas être stables, mais les moments des données peuvent varier dans le temps.
+
+Par conséquent, dans ce cours, nous visons à analyser les interactions dynamiques et multivariées dans les processus évolutifs et non stationnaires.
+
+En premier lieu, nous considérons les processus de séries temporelles univariées stationnaires
+
+Puis nous étendons l'analyse aux processus non stationnaires et aux processus multivariés.
+
+---
+# Objectifs du cours
+
+À la fin de ce cours, vous serez capable de :  
+
