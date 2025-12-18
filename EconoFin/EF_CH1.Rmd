@@ -1,0 +1,309 @@
+---
+title: "Présentation Générale"
+author: "Chapitre 1"
+date: "Économétrie Financière"
+output:
+  beamer_presentation:
+    number_sections: true
+    toc: true
+header-includes:
+  - \usepackage{amsmath}
+  - \usepackage{amsfonts}
+  - \usepackage{amssymb}
+  - \setbeamertemplate{footline}{\hfill\raisebox{2pt}[0pt][0pt]\scriptsize{Économétrie Financière - Chapitre 0}\hspace*{10pt} {\insertframenumber{} / \inserttotalframenumber}\hspace*{2pt}}
+fontsize: 8pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(quantmod)
+library(ggplot2)
+library(dplyr)
+library(kableExtra)
+```
+
+# 1. Introduction
+
+## Plan du chapitre
+
+- Section 2 : Économétrie financière  
+- Section 3 : Données financières  
+- Section 4 : Propriétés statistiques des données financières  
+- Section 5 : Faits stylisés
+
+# Références
+
+- Alexander, A., *Market risk analysis*, volumes 1 et 2, Wiley, 2008.
+- Brooks, C., *Introductory Econometrics for finance*, Cambridge University Press, 3ème édition, 2014.
+- Campbell, J., Y., A.W. Lo et A.C. MacKinlay, *The Econometrics of financial markets*, Princeton University Press, 1997.
+- Greene W. (2007), *Econometric Analysis*, sixième édition, Pearson - Prentice Hill
+- Tsay, R., 2002, *Analysis of Financial Time Series*, Wiley Series
+
+# Notations
+
+Dans ce chapitre, je vais (essayer de...) suivre certaines conventions de notation.
+
+- \( Y \) : variable aléatoire  
+- \( y \) : réalisation  
+- \( f_y (y) \) : fonction de densité ou de masse de probabilité  
+- \( F_y (y) \) : fonction de répartition  
+- \( Pr() \) : probabilité  
+- \( \mathbf{y} \) : vecteur  
+- \( \mathbf{Y} \) : matrice  
+
+**Problème :** ce système ne permet pas de distinguer un vecteur (matrice) d'éléments aléatoires d'un vecteur (matrice) d'éléments non stochastiques (réalisation).
+
+- [x] Abadir et Magnus (2002), *Notation in econometrics: a proposal for a standard*, Econometrics Journal.
+
+# Section 2 : Économétrie Financière
+
+## Objectifs
+
+- Définir l'économétrie financière  
+- Définir les notions d'échantillon et de processus générateur de données  
+- Distinguer modèle paramétrique et non paramétrique  
+- Définir les données en coupe transversale  
+- Définir les données de séries temporelles  
+- Définir les données de panel  
+- Résumer l'approche générale de l'économétrie financière
+
+# Qu'est-ce que l'économétrie financière ?
+
+**Pas une question simple !**
+
+- L'objectif principal de ce cours est de définir ce terme !
+- L'économétrie peut être définie comme l'analyse statistique des phénomènes économiques et financiers.
+
+> « L'économétrie est l'analyse quantitative des phénomènes économiques réels basée sur le développement conjoint de la théorie et de l'observation, reliés par des méthodes d'inférence appropriées. »  
+> — P. A. Samuelson, T. C. Koopmans, et J. R. N. Stone (1954)
+
+# Définition (économétrie financière)
+
+L'économétrie financière est l'application de méthodes statistiques aux données des marchés financiers.  
+Elle diffère des autres formes d'économétrie car l'accent est généralement mis sur l'analyse des prix des actifs financiers négociés sur des marchés compétitifs et liquides.  
+*Source : Wikipedia.*
+
+# Objectifs de l'économétrie financière
+
+- Combiner la théorie financière avec la théorie statistique.
+- Transférer un modèle théorique (financier) en un modèle économétrique (financier).
+- Modéliser les données financières.
+- Prédire les variables financières ainsi que leurs relations.
+- Développer des modèles spécifiques bien adaptés aux faits stylisés des données financières. **Exemple :** modèles GARCH
+
+# Est-ce utile ?
+
+> « Les personnes travaillant dans l'industrie financière ou la recherche en finance utilisent souvent des techniques économétriques dans une gamme d'activités – par exemple, pour soutenir la gestion de portefeuille et l'évaluation des titres. L'économétrie financière est essentielle pour la gestion des risques lorsqu'il est important de savoir à quelle fréquence des résultats d'investissement “mauvais” sont attendus sur les jours, semaines, mois et années à venir. »  
+> *Source : Wikipedia.*
+
+# Développement académique
+
+L'économétrie financière a attiré une attention considérable ces dernières années, tant dans le monde académique que dans la pratique financière.
+
+- **2003 :** Prix Nobel pour Robert F. Engle pour les modèles GARCH (cf. chapitre 6).
+- **2003 :** Création du *Journal of Financial Econometrics*.
+- **2007 :** Création de la *Society for Financial Econometrics (SoFiE)*.
+
+
+# Remarque : Confusion entre termes
+
+- [x] **L'économétrie financière** fait le lien entre l'économie financière, les statistiques et la finance mathématique.
+- [x] **La finance empirique** couvre toutes les études financières basées sur l'analyse de données, ex. *Journal of Empirical Finance*.
+- [x] **L'économie financière** est « une discipline hautement empirique, peut-être la plus empirique parmi les branches de l'économie et même parmi les sciences sociales en général » (Campbell, Lo et MacKinlay, 1997)
+
+# Fondements de l'économétrie (financière)
+
+L'économétrie (financière) repose fondamentalement sur quatre éléments :
+
+1. Un **échantillon** de données
+2. Un **modèle économétrique**
+3. Une **méthode d'estimation**
+4. Des **méthodes d'inférence**
+
+# Pourquoi utiliser un échantillon ?
+
+Supposons que nous voulions étudier une **caractéristique / propriété** \( x \) des **individus** d'une **population**.
+
+- Les individus (unités) de la population ne sont pas nécessairement des personnes : ce peuvent être des entreprises, des actifs, des pays, des indices temporels, etc.
+- La caractéristique \( x \) peut être **quantitative** (prix, rendements, actif total, etc.) ou **qualitative** (défaut, secteur, etc.).
+- La caractéristique \( x \) peut être **stochastique** ou **déterministe** (poids, taille, etc.).
+
+# Population de deux individus
+
+Dans le cas d'une population de deux individus, l'inférence, l'économétrie, etc. (et ce cours…) sont inutiles.
+
+
+# Échantillonnage nécessaire
+
+Lorsque la population est grande ou infinie, l'échantillonnage est le seul moyen d'étudier la caractéristique.
+
+# Définition (Population)
+
+Une population peut être définie comme incluant toutes les personnes ou tous les éléments présentant la caractéristique que l'on souhaite comprendre.
+
+- [x] Dans la plupart des cas, il est impossible d'observer toute la population statistique, en raison de contraintes de coût, de temps, d'accessibilité géographique.
+- [x] Un chercheur observera plutôt un **échantillon statistique** de la population pour tenter d'apprendre quelque chose sur la population dans son ensemble.
+
+# Échantillon aléatoire
+
+Dans la plupart des cas, l'échantillon est aléatoire :
+
+**Définition (Échantillonnage probabiliste)**  
+Un échantillonnage probabiliste est une **méthode d'échantillonnage** dans laquelle chaque unité de la population a une chance (supérieure à zéro) d'être sélectionnée dans l'échantillon.
+
+**Conséquence :** un échantillon est une collection de **variables aléatoires** même si la caractéristique \( x \) est déterministe.
+
+**Échantillon :** \(\{X_1, X_2, ..., X_N\}\)
+
+# Exemple (échantillon aléatoire)
+
+Considérons une population de quatre entreprises et notons \(\tilde{x}\) la caractéristique (supposée non stochastique) de l'entreprise avec :
+
+\[
+\tilde{x}_A = 80 \quad \tilde{x}_B = 50 \quad \tilde{x}_C = 40 \quad \tilde{x}_D = 90
+\]
+
+Considérons un échantillon aléatoire de \(N = 2\) entreprises noté :
+
+\[
+\{ X_1, X_2 \}
+\]
+
+avec \( \{ X_1 \} \) caractéristique de la première entreprise sélectionnée. 
+
+On peut alors obtenir une réalisation :
+
+\[
+\{ x_1, x_2 \} = \{ 50, 80 \} \quad \text{ou} \quad \{ x_1, x_2 \} = \{ 90, 40 \} \quad \text{ou} \quad \{ x_1, x_2 \} = \{ 90, 90 \} \quad \text{etc.}
+\]
+
+# Échantillon aléatoire – Jeu de données
+
+Le résultat d'un échantillonnage probabiliste est un **échantillon aléatoire**, c'est-à-dire une collection de variables aléatoires \( X_1, X_2, ..., X_N \). En général, seule **une réalisation** de l'échantillon est disponible : c'est votre **jeu de données** !
+
+\[
+\{X_1, X_2, ..., X_N\}
+\]
+
+```{r, echo=FALSE, fig.align='center', fig.height=2, fig.width=4.5}
+getSymbols("INTC", from = "2014-01-01", to = "2025-01-01", src = "yahoo")
+chartSeries(INTC, type = "line", theme = chartTheme("white"), TA = NULL)
+```
+
+# Notion de Processus Générateur de Données (DGP)
+
+Lorsque l'on considère deux variables ou plus, la notion de population est remplacée par le concept de **Processus Générateur de Données** (DGP).
+
+**Définition (Processus Générateur de Données)**  
+Un Processus Générateur de Données (DGP) est la distribution de probabilité conjointe qui est supposée caractériser toute la population à partir de laquelle l'échantillon a été tiré.
+
+**Exemple (DGP)**  
+Supposons qu'il existe une relation linéaire entre les rendements \( R_t \) et \( R_{m,t} \) dans la population, telle que  
+
+\[
+E(R_t|R_{m,t}=r_m)=\alpha+\beta r_m
+\]
+
+Cette relation est le DGP pour \( R_t \).
+
+# Le défi de l'économétrie
+
+Le défi de l'économétrie est de tirer des conclusions sur une population (ou DGP) après avoir observé une seule réalisation \(\{x_1, \ldots, x_N\}\) d'un échantillon aléatoire (votre jeu de données).
+
+**Schéma :**  
+Population (paramètres inconnus) → Échantillon → Statistique d'échantillon (estimateur) → **INFÉRENCE**
+
+# Sources des données
+
+En économétrie, les données proviennent de l'une des deux sources : les expériences et les observations non expérimentales.
+
+- Les données **expérimentales** sont basées sur des expériences (randomisées contrôlées) conçues pour évaluer un traitement ou une politique ou pour étudier un effet causal.
+- Les données obtenues en dehors d'un cadre expérimental sont appelées **données observationnelles**.
+
+**Toute cette leçon est consacrée aux méthodes pour traiter des données observationnelles réelles.**
+
+# Types de données
+
+Que les données soient expérimentales ou observationnelles, les jeux de données peuvent être principalement distingués en trois types :
+
+- Données en **coupe transversale**
+- Données de **séries temporelles**
+- Données de **panel**
+
+# Données en coupe transversale
+
+- Données pour différentes entités : actifs, portefeuilles, entreprises, etc.
+- Pas de dimension temporelle (même si la date de collecte varie quelque peu selon les unités, elle est ignorée).
+- L'ordre des données n'a pas d'importance !
+
+# Données de séries temporelles
+
+- Données pour une seule entité (actif, entreprise, etc.) collectées sur plusieurs périodes. Observations répétées des mêmes variables (prix, volume, etc.).
+- L'ordre des données est important !
+- Les observations ne sont généralement pas indépendantes dans le temps.
+
+# Données de panel (longitudinales)
+
+- Données pour plusieurs entités (actif, entreprise, etc.) dans lesquelles les résultats et caractéristiques de chaque entité sont observés à plusieurs moments.
+- Combinent les problématiques de coupe transversale et de séries temporelles.
+- Présentent plusieurs avantages par rapport aux données de coupe transversale et de séries temporelles (selon la question étudiée !).
+
+# Définition (Modèle économétrique)
+
+Un modèle économétrique (financier) spécifie la relation statistique que l'on pense valable entre les différentes quantités économiques relatives à un phénomène économique particulier étudié.
+
+- Un modèle économétrique peut être dérivé d'un modèle économique déterministe en autorisant l'incertitude, ou d'un modèle financier qui est lui-même stochastique.
+- Cependant, il est aussi possible d'utiliser des modèles économétriques qui ne sont liés à aucune théorie économique financière spécifique.
+
+# Modèles paramétriques vs non paramétriques
+
+On distingue :
+
+- **Modèle paramétrique :** la relation (distribution de probabilité jointe) entre la variable dépendante / vecteur \( Y \) et les variables explicatives \( X \) est entièrement caractérisée par un ensemble de paramètres \(\theta\)
+
+\[
+Y = f(X; \theta) + \epsilon
+\]
+
+où la fonction de liaison \( f(.) \) est supposée connue.
+
+- **Modèles non paramétriques et semi-paramétriques :** la fonction de liaison ne peut pas être décrite à l'aide d'un nombre fini de paramètres. La fonction de liaison est supposée inconnue et doit être estimée.
+
+# Approche générale de l'économétrie (financière)
+
+L'approche générale de l'économétrie (financière) est la suivante :
+
+1. **Étape 1 :** Spécification du modèle  
+2. **Étape 2 :** Estimation des paramètres  
+3. **Étape 3 :** Tests de diagnostic  
+   - Tests de significativité ;  
+   - Tests de spécification ;  
+   - Tests de rétrovalidation ;  
+   - etc.  
+4. **Étape 4 :** Interprétation et utilisation du modèle (prévision, étude historique, etc.)
+
+# Concepts clés (Section 2)
+
+- [x] Économétrie financière
+- [x] Échantillon, population et processus générateur de données
+- [x] Modèle paramétrique et non paramétrique
+- [x] Données en coupe transversale
+- [x] Données de séries temporelles
+- [x] Données de panel
+- [x] Approche générale de l'économétrie financière
+
+# Section 3 : Données Financières
+
+## Objectifs
+
+- Introduire les différentes notions de prix d'actifs
+- Définir la notion de fréquence d'échantillonnage
+- Distinguer données haute fréquence (intrajournalières) vs. basse fréquence
+- Définir les prix de clôture et d'ouverture
+- Définir les prix ajustés (de clôture)
+- Définir le rendement simple (net)
+- Définir le rendement composé continûment ou log-rendement
+- Calculer un rendement annualisé
+
+```{r}
+```
