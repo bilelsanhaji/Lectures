@@ -1,0 +1,43 @@
+---
+title: "Économétrie Financière - Master 2 UPEC"
+subtitle: "Applications avec `R`"
+author: "-"
+date: "Hiver 2026"
+output:
+  html_document:
+  toc: true
+toc_float: true
+code_folding: show
+theme: flatly
+highlight: tango
+df_print: paged
+geometry: margin=2.5cm
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+  fig.width = 10,
+  fig.height = 6,
+  cache = TRUE
+)
+```
+
+```{r package, eval=TRUE}
+# install.packages(c("quantmod", "tidyverse", "PerformanceAnalytics",
+# "rugarch", "forecast", "tseries", "ggplot2"))
+
+# Chargement des packages
+library(quantmod)
+library(tidyverse)
+library(PerformanceAnalytics)
+library(rugarch)
+library(forecast)
+library(tseries)
+library(ggplot2)
+``` 
+
