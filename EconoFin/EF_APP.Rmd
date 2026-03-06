@@ -1,6 +1,6 @@
 ---
-title: "Économétrie Financière - Master 2 UPEC"
-subtitle: "Applications avec `R`"
+title: "Économétrie Financière -- Master 2 MASERATI - Parcours DA -- UPEC"
+subtitle: "Applications avec R"
 author: "Bilel Sanhaji"
 date: "Hiver 2026"
 output:
@@ -162,20 +162,21 @@ spec <- ugarchspec(
   variance.model = list(model = "sGARCH", garchOrder = c(1,1)),
   mean.model = list(armaOrder = c(0,0), include.mean = FALSE),
   distribution.model = "norm"
-)
+  )
 # Estimation
 fit <- ugarchfit(spec, data = NVDAres)
-show(fit)
+show(fit) #outup incomplet dans le Rmd, à visualiser dans la console
 plot(fit, which = 1)
 plot(fit, which = 3)
-#TESTS sur les résidus 
-#visualisation
+# #TESTS sur les résidus 
+# #visualisation
 par(mfrow=c(2,2))
 plot(fit, which = 8)
 plot(fit, which = 9)
 plot(fit, which = 10)
 plot(fit, which = 11)
 ```
+
 
 ```{r forecast}
 ?ugarchforecast
