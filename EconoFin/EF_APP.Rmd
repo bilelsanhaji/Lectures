@@ -118,7 +118,7 @@ Box.test(NVDAr^2, lag = 6)
 
 ## Stats Des
 
-```{r}
+```{r StatsDes}
 table.Stats(NVDAr)
 ```
 
@@ -186,12 +186,11 @@ plot(forecast, which = 1)
 plot(forecast, which = 3)
 ```
 
-
 ## GARCH Simulation
 
 Simuler 500 observations d'un ARCH(1)
 
-```{r}
+```{r arch1sim}
 obs = 500
 c = 0.02
 a = 0.99
@@ -210,7 +209,7 @@ ts.plot(h)
 
 Simuler 500 observations d'un AR(1)-ARCH(1)
 
-```{r}
+```{r ar1arch1sim}
 obs = 500
 alpha = 0.01
 phi = 0.5
@@ -262,10 +261,9 @@ ar1garch11sim = function(obs, alpha, phi, c, a, b, init)
 ```{r testFonction}
 simuAR1GARCH11 = ar1garch11sim(obs = 5000, alpha = 0.01, phi = 0.4, c = 0.01, a = 0.04, b = 0.95, init = 1000)
 ```
-```{r extractionOutput}
+```{r extractionOutputSpecific}
 ts.plot(simuAR1GARCH11$y)
 ```
-
 
 
 # MGARCH
