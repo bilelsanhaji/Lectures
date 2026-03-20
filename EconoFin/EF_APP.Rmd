@@ -1,6 +1,6 @@
 ---
-title: "Économétrie Financière -- Master 2 MASERATI - Parcours DA -- UPEC"
-subtitle: "Applications avec R"
+title: "Économétrie Financière - Master 2 UPEC"
+subtitle: "Applications avec `R`"
 author: "Bilel Sanhaji"
 date: "Hiver 2026"
 output:
@@ -14,7 +14,7 @@ df_print: paged
 geometry: margin=2.5cm
 fontsize: 11pt
 ---
-
+  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -47,7 +47,7 @@ library(FinTS)
 
 5 années d'une série financière journalière
 
-```{r data}
+```{r data1}
 ?getSymbols
 NVDA = getSymbols("NVDA", src = "yahoo", 
                   from = "2012-01-01", to = "2017-01-01", 
@@ -60,87 +60,142 @@ NVDAr = na.omit(NVDAr)
 plot(NVDAp, main = "Prix NVIDIA")
 plot(NVDAr, main = "Rendements NVIDIA")
 ```
+```{r data2}
+?getSymbols
+AMZN = getSymbols("AMZN", src = "yahoo", 
+                  from = "2012-01-01", to = "2017-01-01", 
+                  auto.assign = FALSE)
+
+AMZNp = AMZN$AMZN.Adjusted
+AMZNr = diff(log(AMZNp))*100
+AMZNr = na.omit(AMZNr)
+
+plot(AMZNp, main = "Prix AMAZON")
+plot(AMZNr, main = "Rendements AMAZON")
+```
 
 ### 1. Stationnarité
 
 ```{r stationnarite}
+# NVIDIA
 adf.test(NVDAp)
 adf.test(NVDAr)
+# AMAZON
+adf.test(AMZNp)
+adf.test(AMZNr)
 ```
 
 ### 2. Autocorrélation
 
-```{r Autocorrélation}
+```{r Autocorrélation1}
 acf(NVDAp)
 acf(NVDAr)
 Box.test(NVDAp, lag = 6, type = "Ljung")
 Box.test(NVDAr, lag = 6)
 ```
-
+```{r Autocorrélation2}
+acf(NVDAp)
+acf(AMZNr)
+Box.test(AMZNp, lag = 6, type = "Ljung")
+Box.test(AMZNr, lag = 6)
+```
 ### 3. Leptokurticité
 
-```{r Leptokurticite}
+```{r Leptokurticite1}
 hist(NVDAr, freq = F, ylim = c(0,0.40))
 lines(density(NVDAr), col="darkred")
 lines(density(rnorm(1000)), col="darkblue")
 kurtosis(NVDAr,method = "sample")
 ```
+```{r Leptokurticite2}
+hist(AMZNr, freq = F, ylim = c(0,0.40))
+lines(density(AMZNr), col="darkred")
+lines(density(rnorm(1000)), col="darkblue")
+kurtosis(AMZNr,method = "sample")
+```
 
-```{r qqplot}
+```{r qqplot1}
 qqnorm(NVDAr)
 qqline(NVDAr, col="darkgreen", lwd=2)
+```
+```{r qqplot2}
+qqnorm(AMZNr)
+qqline(AMZNr, col="darkgreen", lwd=2)
 ```
 
 ### 4. Skewness
 
-```{r Skewness}
+```{r Skewness1}
 skewness(NVDAr)
+```
+```{r Skewness2}
+skewness(AMZNr)
 ```
 
 ### 5. Cluster de volatité
 
-```{r ClusterVol}
+```{r ClusterVol1}
 plot(NVDAr^2)
+```
+```{r ClusterVol2}
+plot(AMZNr^2)
 ```
 
 ### 6. Normalité
 
 ```{r TestNormalite}
 jarque.bera.test(NVDAr)
+jarque.bera.test(AMZNr)
 ```
 
 ### 7. Rendements au carré
 
-```{r acfCarre}
+```{r acfCarre1}
 acf(NVDAr^2)
 Box.test(NVDAr^2, lag = 6)
+```
+```{r acfCarre2}
+acf(AMZNr^2)
+Box.test(AMZNr^2, lag = 6)
 ```
 
 ## Stats Des
 
-```{r StatsDes}
+```{r statDes}
 table.Stats(NVDAr)
+table.Stats(AMZNr)
 ```
 
 # ARMA
 
 Modélisation et estimation des rendements avec des modeles de **moyenne conditionnelle** 
 
-```{r ARMA11estim}
+```{r ARMA11estim1}
 NVDArEstim = arima(x = NVDAr, order = c(1,0,1))
 coeftest(NVDArEstim) #fonction dans package lmtest
 checkresiduals(NVDArEstim)
 ```
+```{r ARMA11estim2}
+AMZNrEstim = arima(x = AMZNr, order = c(1,0,1))
+coeftest(AMZNrEstim) #fonction dans package lmtest
+checkresiduals(AMZNrEstim)
+```
 
-```{r autoarima}
+```{r autoarima1}
 # NVDArEstimAUTO = auto.arima(NVDAr) #package forecast
 # summary(NVDArEstimAUTO)
 # coeftest(NVDArEstimAUTO)
 ```
 
+```{r autoarima2}
+# AMZNrEstimAUTO = auto.arima(AMZNr) #package forecast
+# summary(AMZNrEstimAUTO)
+# coeftest(AMZNrEstimAUTO)
+```
 
 Test sur les résidus
-```{r ARMAresidusTest}
+
+```{r ARMAresidusTest1}
 NVDAres = NVDArEstim$residuals
 #normalité
 jarque.bera.test(NVDAres)
@@ -150,10 +205,22 @@ Box.test(NVDAres, lag = 6)
 ArchTest(NVDAres)
 ```
 
+```{r ARMAresidusTest2}
+AMZNres = AMZNrEstim$residuals
+#normalité
+jarque.bera.test(AMZNres)
+#autocorrélation
+Box.test(AMZNres, lag = 6)
+#hétéroscédasticité
+ArchTest(AMZNres)
+```
+
+
 # GARCH
 
 ## GARCH Estimation
-```{r GARCHestim}
+```{r GARCHestim1}
+# !! ce chunk ne compile pas, mais knit fonctionne sur le .Rmd
 # pachage rugarch
 #?rugarch
 # Spécification GARCH(1,1)
@@ -164,18 +231,43 @@ spec <- ugarchspec(
   distribution.model = "norm"
   )
 # Estimation
-fit <- ugarchfit(spec, data = NVDAres)
-show(fit) #outup incomplet dans le Rmd, à visualiser dans la console
+fit <- ugarchfit(spec, data = NVDAr) #pour moi aucun modele basique ne colle aux données, donc j'utilise les rendements : y_t = eps_t (!! mais il faudrait utiliser les résidus du modèle de moyenne conditionnelle -- ARMA(p,q) par exemple)
+show(fit)
 plot(fit, which = 1)
 plot(fit, which = 3)
-# #TESTS sur les résidus 
-# #visualisation
+#TESTS sur les résidus
+#visualisation
 par(mfrow=c(2,2))
 plot(fit, which = 8)
 plot(fit, which = 9)
 plot(fit, which = 10)
 plot(fit, which = 11)
 ```
+```{r GARCHestim2}
+# !! ce chunk ne compile pas, mais knit fonctionne sur le .Rmd
+# pachage rugarch
+#?rugarch
+# Spécification GARCH(1,1)
+#?ugarchspec
+spec <- ugarchspec(
+  variance.model = list(model = "sGARCH", garchOrder = c(1,1)),
+  mean.model = list(armaOrder = c(0,0), include.mean = FALSE),
+  distribution.model = "norm"
+  )
+# Estimation
+fit <- ugarchfit(spec, data = AMZNr) #pour moi aucun modele basique ne colle aux données, donc j'utilise les rendements : y_t = eps_t (!! mais il faudrait utiliser les résidus du modèle de moyenne conditionnelle -- ARMA(p,q) par exemple)
+show(fit)
+plot(fit, which = 1)
+plot(fit, which = 3)
+#TESTS sur les résidus
+#visualisation
+par(mfrow=c(2,2))
+plot(fit, which = 8)
+plot(fit, which = 9)
+plot(fit, which = 10)
+plot(fit, which = 11)
+```
+
 
 
 ```{r forecast}
@@ -186,11 +278,12 @@ plot(forecast, which = 1)
 plot(forecast, which = 3)
 ```
 
+
 ## GARCH Simulation
 
 Simuler 500 observations d'un ARCH(1)
 
-```{r arch1sim}
+```{r}
 obs = 500
 c = 0.02
 a = 0.99
@@ -200,16 +293,16 @@ h = matrix(0,obs,1)
 eps = matrix(0,obs,1)
 h[1] = c/(1-a) # 1 est tout aussi bien
 eps[1] = mean(z)*sqrt(h[1]) # 0 est tout aussi bien
-  for (t in 2:obs) {
-    h[t] = c + a*eps[t-1]^2
-    eps[t] = sqrt(h[t])*z[t]
-  }
+for (t in 2:obs) {
+  h[t] = c + a*eps[t-1]^2
+  eps[t] = sqrt(h[t])*z[t]
+}
 ts.plot(h)
 ```
 
 Simuler 500 observations d'un AR(1)-ARCH(1)
 
-```{r ar1arch1sim}
+```{r}
 obs = 500
 alpha = 0.01
 phi = 0.5
@@ -246,11 +339,11 @@ ar1garch11sim = function(obs, alpha, phi, c, a, b, init)
   h[1] = c/(1-a) # valeur > 0 est tout aussi bien
   eps[1] = mean(z)*sqrt(h[1]) # 0 est tout aussi bien
   y[1] = alpha/(1-phi) # 0 est tout aussi bien
-    for (t in 2:obs) {
-      h[t] = c + a*eps[t-1]^2 + b*h[t-1]
-      eps[t] = sqrt(h[t])*z[t]
-      y[t] = alpha + phi*y[t-1] + eps[t]
-    }
+  for (t in 2:obs) {
+    h[t] = c + a*eps[t-1]^2 + b*h[t-1]
+    eps[t] = sqrt(h[t])*z[t]
+    y[t] = alpha + phi*y[t-1] + eps[t]
+  }
   y = y[init:(obs-1)]
   eps = eps[init:(obs-1)]
   h = h[init:(obs-1)]
@@ -261,9 +354,88 @@ ar1garch11sim = function(obs, alpha, phi, c, a, b, init)
 ```{r testFonction}
 simuAR1GARCH11 = ar1garch11sim(obs = 5000, alpha = 0.01, phi = 0.4, c = 0.01, a = 0.04, b = 0.95, init = 1000)
 ```
-```{r extractionOutputSpecific}
+
+```{r extractionOutput}
 ts.plot(simuAR1GARCH11$y)
 ```
 
 
+
 # MGARCH
+
+```{r statioCheck}
+stationarity <- function(A,B){
+  G <- kronecker(A,A) + kronecker(B,B)
+  max(Mod(eigen(G)$values))
+}
+
+```
+
+
+```{r bekkV1}
+#install.packages(mgarchBEKK)
+library(mgarchBEKK)
+library(mvtnorm)
+??mgarchBEKK
+AN = cbind(NVDAres, AMZNres)
+ANbekk = BEKK(AN)
+ANbekk$est.params
+ANbekk$asy.se.coef
+stationarity(ANbekk$est.params$`2`,ANbekk$est.params$`3`)
+```
+```{r graphVolbekkV1}
+par(mfrow=c(3,1))
+plot(ANbekk$sd[[1]],type="l")
+plot(ANbekk$sd[[2]],type="l")
+plot(ANbekk$cor[[1]][[2]], type="l")
+```
+
+
+```{r bekkV2}
+#install.packages("BEKKs")
+library(BEKKs)
+ANspec = bekk_spec()
+#ANspec = bekk_spec(model = list(type="bekk", asymmetric=F))
+ANfit = bekk_fit(ANspec, AN)
+summary(ANfit)
+plot(ANfit)
+plot(ANfit$sigma_t[,2])
+cor(AN)
+```
+
+```{r}
+#install.packages("rmgarch")
+library(rmgarch)   # modèles multivariés (DCC-GARCH)
+#??rmgarch
+multispec_uni = multispec(list(spec, spec))
+
+# Spécification DCC-GARCH(1,1) : 
+spec_dcc <- dccspec(
+  uspec  = multispec_uni,        # Spécifications univariées
+  dccOrder = c(1,1),             # DCC(1,1)
+  distribution = "mvnorm"        # Normale multivariée ou "mvt" pour Student multivariée
+)
+
+# Estimation DCC 
+
+fit_dcc <- dccfit(spec_dcc, data = AN)
+show(fit_dcc)
+
+plot(fit_dcc, which=1)
+#plot(fit_dcc, which=2)
+plot(fit_dcc, which=3)
+plot(fit_dcc, which=4)
+plot(fit_dcc, which=5)
+```
+# Il faut tester les résidus par la suite !!!
+```{r}
+z_t = residuals(fit_dcc)
+par(mfrow = c(2,2))
+acf(z_t[,1])
+acf(z_t[,2])
+acf(z_t[,1]^2)
+acf(z_t[,2]^2)
+par(mfrow = c(1,1))
+```
+
+
